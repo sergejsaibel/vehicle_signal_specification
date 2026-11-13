@@ -88,6 +88,8 @@ overlays:
 	vspec export json ${COMMON_ARGS} -l overlays/profiles/motorbike.vspec ${COMMON_VSPEC_ARG} -o vss_motorbike.json
 	vspec export json ${COMMON_ARGS} -l overlays/extensions/dual_wiper_systems.vspec ${COMMON_VSPEC_ARG} -o vss_dualwiper.json
 	vspec export json ${COMMON_ARGS} -l overlays/extensions/OBD.vspec ${COMMON_VSPEC_ARG} -o vss_obd.json
+	vspec export json ${COMMON_ARGS} -e dynamic -l overlays/extensions/Trailers.vspec ${COMMON_VSPEC_ARG} -o vss_trailers.json
+	vspec export json ${COMMON_ARGS} -e dynamic -l overlays/extensions/Trailers.vspec -l overlays/extensions/Trailers/examples/ExampleCombination.vspec ${COMMON_VSPEC_ARG} -o vss_trailers_example.json
 
 clean:
 	rm -f vss.*

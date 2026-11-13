@@ -1,0 +1,124 @@
+# Copyright (c) 2026 Contributors to COVESA
+#
+# This program and the accompanying materials are made available under the
+# terms of the Mozilla Public License 2.0 which is available at
+# https://www.mozilla.org/en-US/MPL/2.0/
+#
+# SPDX-License-Identifier: MPL-2.0
+
+#
+# Definition of a single trailer.
+#
+# Within a dynamic instance, an "attribute" is constant for as long as the
+# instance is bound to the same trailer (same key in Vehicle.Trailers.Ids).
+# The Identification attributes are set when the trailer is bound to the instance
+# (e.g. read from the trailer via ISO 11992 or its telematics unit), all other
+# attributes are taken from the configuration retrieved via Vehicle.Trailers.ConfigurationUri.
+# A "sensor" is provided at runtime by the trailer or the towing vehicle.
+#
+# The presence signal (Vehicle.Trailers.IsTrailerNConnected) and the key
+# (Vehicle.Trailers.Ids) of an instance are defined on Vehicle.Trailers,
+# so that they are available before this sub-branch is populated.
+#
+
+#
+# Identification
+#
+Identification:
+  type: branch
+  description: Identification of the trailer bound to this instance.
+
+Identification.Id:
+  datatype: string
+  type: attribute
+  description: Unique identifier of the trailer coupled at this position, e.g. VIN.
+  comment: Equals the key of this instance, i.e. element N-1 of Vehicle.Trailers.Ids for instance TrailerN.
+           The type of identifier is given by Identification.IdType.
+
+Identification.IdType:
+  datatype: string
+  type: attribute
+  allowed: ['UNKNOWN', 'VIN', 'TELEMATICS_UNIT_ID', 'OEM_SPECIFIC']
+  default: 'UNKNOWN'
+  description: Type of identifier given in Identification.Id.
+  comment: VIN = Vehicle Identification Number according to ISO 3779.
+           TELEMATICS_UNIT_ID = Identifier of the trailer telematics unit.
+           OEM_SPECIFIC = Other unique identifier defined by the trailer manufacturer.
+
+Identification.Manufacturer:
+  datatype: string
+  type: attribute
+  description: Name of the trailer manufacturer.
+
+Identification.ConfigurationVersion:
+  datatype: string
+  type: attribute
+  description: Version of the trailer configuration resolved for this instance.
+  comment: Provided together with the configuration. Allows a client to cache a resolved configuration,
+           and to detect that a cached configuration is outdated.
+           Can for example be a version number or a content hash.
+
+#
+# General trailer properties (resolved from configuration)
+#
+Type:
+  datatype: string
+  type: attribute
+  allowed: ['UNKNOWN', 'SEMI_TRAILER', 'FULL_TRAILER', 'CENTER_AXLE_TRAILER', 'CONVERTER_DOLLY', 'CARAVAN', 'OTHER']
+  default: 'UNKNOWN'
+  description: Type of the trailer.
+
+Length:
+  datatype: uint16
+  type: attribute
+  unit: mm
+  description: Overall length of the trailer, excluding the drawbar.
+
+Width:
+  datatype: uint16
+  type: attribute
+  unit: mm
+  description: Overall width of the trailer.
+
+Height:
+  datatype: uint16
+  type: attribute
+  unit: mm
+  description: Overall height of the trailer.
+
+GrossWeight:
+  datatype: uint32
+  type: attribute
+  unit: kg
+  description: Maximum permitted weight of the trailer, including full load.
+
+AxleCount:
+  datatype: uint8
+  type: attribute
+  min: 1
+  max: 15
+  description: Number of axles on the trailer.
+  comment: Equals the number of instances of the dynamic branch Axle selected by the trailer configuration.
+
+#
+# Runtime trailer properties
+#
+CurrentWeight:
+  datatype: uint32
+  type: sensor
+  unit: kg
+  description: Current overall weight of the trailer, including load.
+
+#
+# Axles of the trailer
+#
+Axle:
+  type: branch
+  instances: Row[1,15]
+  dynamic: true
+  description: Axle signals of the trailer.
+  comment: Axles are counted from the front of the trailer.
+           The instance list defines the upper bound. The instances present for a specific trailer
+           are selected by the trailer configuration, see Vehicle.Trailers.ConfigurationUri.
+
+#include TrailerAxle.vspec Axle

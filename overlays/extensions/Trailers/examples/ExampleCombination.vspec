@@ -1,0 +1,28 @@
+# Copyright (c) 2026 Contributors to COVESA
+#
+# This program and the accompanying materials are made available under the
+# terms of the Mozilla Public License 2.0 which is available at
+# https://www.mozilla.org/en-US/MPL/2.0/
+#
+# SPDX-License-Identifier: MPL-2.0
+
+#
+# EXAMPLE of a resolved trailer combination at one point in time.
+# Shall be applied after overlays/extensions/Trailers.vspec.
+#
+# Runtime state assumed:
+#   Vehicle.Trailers.ConfigurationUri = 'https://vss.tractor-oem.example/v1/trailer-configurations/{id}'
+#   Vehicle.Trailers.ConnectedCount = 1
+#   Vehicle.Trailers.Ids = ['YS2TRAILER0000001']
+#   Vehicle.Trailers.IsTrailer1Connected = true
+#   Vehicle.Trailers.Trailer1.Identification.Id = 'YS2TRAILER0000001'
+#
+# A resolver (e.g. the VSS server in the towing vehicle) expands the URI template with the
+# trailer Id, i.e. https://vss.tractor-oem.example/v1/trailer-configurations/YS2TRAILER0000001.
+# The tractor OEM service maps the Id to the trailer OEM and returns its configuration,
+# which the resolver mounts below the instance the trailer is coupled at.
+# On decoupling the mount is removed again and the instance falls back to
+# the generic definition with Vehicle.Trailers.IsTrailer1Connected = false.
+#
+
+#include ExampleSemiTrailer.vspec Vehicle.Trailers.Trailer1

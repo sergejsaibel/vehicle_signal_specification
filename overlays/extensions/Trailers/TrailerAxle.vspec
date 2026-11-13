@@ -1,0 +1,71 @@
+# Copyright (c) 2026 Contributors to COVESA
+#
+# This program and the accompanying materials are made available under the
+# terms of the Mozilla Public License 2.0 which is available at
+# https://www.mozilla.org/en-US/MPL/2.0/
+#
+# SPDX-License-Identifier: MPL-2.0
+
+#
+# Definition of a single trailer axle.
+#
+
+WheelCount:
+  datatype: uint8
+  type: attribute
+  min: 1
+  max: 15
+  description: Number of wheels on the axle.
+  comment: Equals the number of instances of the dynamic branch Wheel selected by the trailer configuration.
+
+IsLiftAxle:
+  datatype: boolean
+  type: attribute
+  default: false
+  description: Indicates if the axle can be lifted. True = Lift axle. False = Fixed axle.
+
+IsSteered:
+  datatype: boolean
+  type: attribute
+  default: false
+  description: Indicates if the axle is steered. True = Steered axle. False = Non-steered axle.
+
+WheelDiameter:
+  datatype: float
+  type: attribute
+  unit: inch
+  description: Diameter of wheels (rims without tires), in inches, as per ETRTO / TRA standard.
+
+TireWidth:
+  datatype: uint16
+  type: attribute
+  unit: mm
+  description: Nominal section width of tires, in mm, as per ETRTO / TRA standard.
+
+IsLifted:
+  datatype: boolean
+  type: sensor
+  description: Indicates if a lift axle is currently lifted. True = Axle lifted. False = Axle on the road.
+  comment: Only relevant if IsLiftAxle is true.
+
+Weight:
+  datatype: uint16
+  type: sensor
+  unit: kg
+  description: Total mass imposed by the tires on the road surface at the specified axle.
+
+#
+# Wheels on the axle
+#
+Wheel:
+  type: branch
+  instances: Position[1,15]
+  dynamic: true
+  description: Wheel signals of the trailer axle.
+  comment: Wheels are counted from left to right, as seen in the driving direction,
+           e.g. for an axle with twin tires Position1 = Left outer, Position2 = Left inner,
+           Position3 = Right inner, Position4 = Right outer.
+           The instance list defines the upper bound. The instances present for a specific axle
+           are selected by the trailer configuration.
+
+#include TrailerWheel.vspec Wheel

@@ -1,0 +1,126 @@
+# Copyright (c) 2026 Contributors to COVESA
+#
+# This program and the accompanying materials are made available under the
+# terms of the Mozilla Public License 2.0 which is available at
+# https://www.mozilla.org/en-US/MPL/2.0/
+#
+# SPDX-License-Identifier: MPL-2.0
+
+#
+# EXAMPLE trailer configuration for trailer Id YS2TRAILER0000001, as returned via
+#   Vehicle.Trailers.ConfigurationUri = https://vss.tractor-oem.example/v1/trailer-configurations/{id}
+# The tractor OEM service maps the Id to the trailer OEM, which provides this document.
+#
+# The configuration is a VSS overlay ROOTED AT THE TRAILER INSTANCE.
+# It contains no Vehicle.Trailers.TrailerN prefix, so the same document can be
+# bound to any trailer position. Binding is done by mounting it below the
+# instance where the trailer is coupled, e.g.
+#   #include ExampleSemiTrailer.vspec Vehicle.Trailers.Trailer1
+#
+# The configuration:
+#   - narrows each dynamic branch (Axle, Axle.RowN.Wheel) to the instances that exist,
+#   - gives values to attributes by "default",
+#   - for enumerated attributes narrows "allowed" to the actual value.
+#
+# Trailer: 3-axle semi-trailer, twin tires on all axles, first axle is a lift axle.
+#
+
+Identification.ConfigurationVersion:
+  datatype: string
+  type: attribute
+  default: '2026-11-01'
+  description: Version of the trailer configuration resolved for this instance.
+
+Type:
+  datatype: string
+  type: attribute
+  allowed: ['SEMI_TRAILER']
+  default: 'SEMI_TRAILER'
+  description: Type of the trailer.
+
+Length:
+  datatype: uint16
+  type: attribute
+  unit: mm
+  default: 13600
+  description: Overall length of the trailer, excluding the drawbar.
+
+Width:
+  datatype: uint16
+  type: attribute
+  unit: mm
+  default: 2550
+  description: Overall width of the trailer.
+
+Height:
+  datatype: uint16
+  type: attribute
+  unit: mm
+  default: 4000
+  description: Overall height of the trailer.
+
+GrossWeight:
+  datatype: uint32
+  type: attribute
+  unit: kg
+  default: 39000
+  description: Maximum permitted weight of the trailer, including full load.
+
+AxleCount:
+  datatype: uint8
+  type: attribute
+  default: 3
+  description: Number of axles on the trailer.
+
+Axle:
+  type: branch
+  instances: Row[1,3]
+  description: Axle signals of the trailer.
+
+#
+# Axle 1 - lift axle
+#
+Axle.Row1.WheelCount:
+  datatype: uint8
+  type: attribute
+  default: 4
+  description: Number of wheels on the axle.
+
+Axle.Row1.IsLiftAxle:
+  datatype: boolean
+  type: attribute
+  default: true
+  description: Indicates if the axle can be lifted. True = Lift axle. False = Fixed axle.
+
+Axle.Row1.Wheel:
+  type: branch
+  instances: Position[1,4]
+  description: Wheel signals of the trailer axle.
+
+#
+# Axle 2
+#
+Axle.Row2.WheelCount:
+  datatype: uint8
+  type: attribute
+  default: 4
+  description: Number of wheels on the axle.
+
+Axle.Row2.Wheel:
+  type: branch
+  instances: Position[1,4]
+  description: Wheel signals of the trailer axle.
+
+#
+# Axle 3
+#
+Axle.Row3.WheelCount:
+  datatype: uint8
+  type: attribute
+  default: 4
+  description: Number of wheels on the axle.
+
+Axle.Row3.Wheel:
+  type: branch
+  instances: Position[1,4]
+  description: Wheel signals of the trailer axle.

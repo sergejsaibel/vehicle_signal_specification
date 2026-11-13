@@ -1,0 +1,132 @@
+# Copyright (c) 2026 Contributors to COVESA
+#
+# This program and the accompanying materials are made available under the
+# terms of the Mozilla Public License 2.0 which is available at
+# https://www.mozilla.org/en-US/MPL/2.0/
+#
+# SPDX-License-Identifier: MPL-2.0
+
+#
+# PROPOSAL: Dynamic trailer instances
+#
+# Overlay adding support for up to 5 trailers that can be coupled and decoupled
+# at any time (e.g. truck with full trailer, road trains, B-doubles, dollies).
+#
+# The proposal introduces the extended keyword "dynamic" (see
+# docs-gen/content/extensions/dynamic_instances.md). Tooling must whitelist it:
+#
+#   vspec export json -u spec/units.yaml --strict -e dynamic \
+#     -l overlays/extensions/Trailers.vspec \
+#     -s spec/VehicleSignalSpecification.vspec -o vss_trailers.json
+#
+# The instance list "Trailer[1,5]" defines the UPPER BOUND of trailers.
+# At runtime only the instances whose presence signal is true are populated.
+# Each populated instance is bound to one physical trailer via its key in Vehicle.Trailers.Ids,
+# and its exact structure (number of axles, wheels per axle, attribute values)
+# is resolved through the single configuration URI of the towing vehicle OEM.
+#
+
+Vehicle:
+  type: branch
+
+Vehicle.Trailers:
+  type: branch
+  instances: Trailer[1,5]
+  dynamic:
+    presence: Vehicle.Trailers.Is{instance}Connected
+    key: Vehicle.Trailers.Ids[{index}]
+    configuration: Vehicle.Trailers.ConfigurationUri
+  description: Trailers that can be coupled to and decoupled from the vehicle during operation.
+  comment: Instances are numbered in coupling order, Trailer1 is the trailer coupled directly to the towing vehicle,
+           Trailer2 is coupled to Trailer1, and so on. A converter dolly counts as a trailer instance.
+           The instance number reflects the position in the combination, not the identity of the trailer.
+           The identity of the trailer bound to instance TrailerN is given by element N-1 of Vehicle.Trailers.Ids.
+           The "dynamic" keyword states that instances may appear and disappear at runtime,
+           see the dynamic instances documentation for the semantics of presence, key and configuration.
+
+Vehicle.Trailers.MaxCount:
+  datatype: uint8
+  type: attribute
+  max: 5
+  default: 5
+  instantiate: false
+  description: Maximum number of trailers supported by the vehicle.
+
+Vehicle.Trailers.ConfigurationUri:
+  datatype: string
+  type: attribute
+  instantiate: false
+  description: URI template for retrieving the configuration of a trailer by its unique identifier.
+  comment: One URI for all trailers, typically provided by the OEM of the towing vehicle.
+           The URI is a URI template according to RFC 6570 with the variable {id}, which is replaced
+           by the unique identifier of the trailer (element of Vehicle.Trailers.Ids), e.g. https://vss.tractor-oem.example/v1/trailer-configurations/{id}.
+           The service behind the URI maps the trailer identifier to the URI of the trailer OEM and returns
+           the trailer configuration, either by redirecting (HTTP 3xx) to the trailer OEM or by forwarding its response.
+           The configuration is a VSS overlay rooted at the trailer instance, i.e. it uses paths relative to
+           Vehicle.Trailers.TrailerN. It selects the instances of all dynamic child branches (Axle, Axle.Wheel)
+           and provides values for the attributes of the trailer.
+
+Vehicle.Trailers.ConnectedCount:
+  datatype: uint8
+  type: sensor
+  max: 5
+  instantiate: false
+  description: Number of trailers currently coupled to the vehicle.
+  comment: Equals the number of IsTrailerNConnected signals that are true.
+           Instances Trailer1 to TrailerN, where N = ConnectedCount, shall be the populated ones.
+
+#
+# Presence signals of the dynamic instances.
+# Defined on Vehicle.Trailers and not inside the instances, so that they are available
+# before the instance sub-branches are populated (presence: Vehicle.Trailers.Is{instance}Connected).
+#
+Vehicle.Trailers.IsTrailer1Connected:
+  datatype: boolean
+  type: sensor
+  instantiate: false
+  description: Indicates if a trailer is coupled at position 1 (directly to the towing vehicle).
+               True = Trailer coupled. False = No trailer coupled.
+  comment: Presence signal of instance Trailer1. When false, all signals of Vehicle.Trailers.Trailer1 are not available.
+
+Vehicle.Trailers.IsTrailer2Connected:
+  datatype: boolean
+  type: sensor
+  instantiate: false
+  description: Indicates if a trailer is coupled at position 2. True = Trailer coupled. False = No trailer coupled.
+  comment: Presence signal of instance Trailer2. When false, all signals of Vehicle.Trailers.Trailer2 are not available.
+
+Vehicle.Trailers.IsTrailer3Connected:
+  datatype: boolean
+  type: sensor
+  instantiate: false
+  description: Indicates if a trailer is coupled at position 3. True = Trailer coupled. False = No trailer coupled.
+  comment: Presence signal of instance Trailer3. When false, all signals of Vehicle.Trailers.Trailer3 are not available.
+
+Vehicle.Trailers.IsTrailer4Connected:
+  datatype: boolean
+  type: sensor
+  instantiate: false
+  description: Indicates if a trailer is coupled at position 4. True = Trailer coupled. False = No trailer coupled.
+  comment: Presence signal of instance Trailer4. When false, all signals of Vehicle.Trailers.Trailer4 are not available.
+
+Vehicle.Trailers.IsTrailer5Connected:
+  datatype: boolean
+  type: sensor
+  instantiate: false
+  description: Indicates if a trailer is coupled at position 5. True = Trailer coupled. False = No trailer coupled.
+  comment: Presence signal of instance Trailer5. When false, all signals of Vehicle.Trailers.Trailer5 are not available.
+
+Vehicle.Trailers.Ids:
+  datatype: string[]
+  type: sensor
+  instantiate: false
+  description: Unique identifiers of the currently coupled trailers, ordered by coupling position.
+  comment: Key of the dynamic instances (key Vehicle.Trailers.Ids[{index}]). Element i (zero-based) identifies the trailer bound
+           to instance Trailer(i+1), e.g. its VIN. The array length equals ConnectedCount.
+           Defined on Vehicle.Trailers and not inside the instances, so that the identifiers are available
+           before the instance sub-branches are populated and before their configuration is resolved.
+           A changed element means that another trailer is bound to the instance, and its configuration
+           shall be resolved again via Vehicle.Trailers.ConfigurationUri.
+           Allows a client to detect coupling, decoupling or reordering of trailers by subscribing to a single signal.
+
+#include Trailers/Trailer.vspec Vehicle.Trailers

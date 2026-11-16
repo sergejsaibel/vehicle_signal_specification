@@ -11,6 +11,7 @@ Larger overlays to adapt VSS to a specific vehicle category, like motorbikes.
 
 Smaller overlays typically to be applied after applying profiles (if any).
 
-* `Trailers.vspec` - Proposal for up to 5 dynamically coupled trailers (`Vehicle.Trailers`), using the extended
-  attribute `dynamic`. Requires `-e dynamic` when running vss-tools in strict mode.
-  See `docs-gen/content/extensions/dynamic_instances.md` and the examples in `extensions/Trailers/examples`.
+* `Trailers.vspec` - Proposal for up to 5 dynamically coupled trailers (`Vehicle.Trailers.Trailer1` to `Trailer5`),
+  modeled as dynamic branches with events and actions. Requires `-e dynamic -e events -e actions` when running
+  vss-tools in strict mode.
+  See `docs-gen/content/extensions/dynamic_branches.md` and the examples in `extensions/Trailers/examples`.

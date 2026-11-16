@@ -10,19 +10,18 @@
 # EXAMPLE of a resolved trailer combination at one point in time.
 # Shall be applied after overlays/extensions/Trailers.vspec.
 #
-# Runtime state assumed:
+# Runtime state assumed (trailer 1 was just coupled):
 #   Vehicle.Trailers.ConfigurationUri = 'https://vss.tractor-oem.example/v1/trailer-configurations/{id}'
 #   Vehicle.Trailers.ConnectedCount = 1
-#   Vehicle.Trailers.Ids = ['YS2TRAILER0000001']
-#   Vehicle.Trailers.IsTrailer1Connected = true
-#   Vehicle.Trailers.Trailer1.Identification.Id = 'YS2TRAILER0000001'
+#   Vehicle.Trailers.Trailer1.Id = 'YS2TRAILER0000001'
+#   Vehicle.Trailers.Trailer1.IsConnected = true     (event Connected)
 #
-# A resolver (e.g. the VSS server in the towing vehicle) expands the URI template with the
-# trailer Id, i.e. https://vss.tractor-oem.example/v1/trailer-configurations/YS2TRAILER0000001.
+# The broker executes the action ResolveBranchByUri of Trailer1. It expands the URI template with the
+# value of Trailer1.Id, i.e. https://vss.tractor-oem.example/v1/trailer-configurations/YS2TRAILER0000001.
 # The tractor OEM service maps the Id to the trailer OEM and returns its configuration,
-# which the resolver mounts below the instance the trailer is coupled at.
-# On decoupling the mount is removed again and the instance falls back to
-# the generic definition with Vehicle.Trailers.IsTrailer1Connected = false.
+# which the broker mounts at Vehicle.Trailers.Trailer1.
+# On decoupling (event Disconnected, IsConnected true -> false) the action RemoveDynamicSignals
+# removes all signals marked dynamic again, and the static signals Id and IsConnected remain.
 #
 
 #include ExampleSemiTrailer.vspec Vehicle.Trailers.Trailer1

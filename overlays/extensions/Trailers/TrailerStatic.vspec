@@ -1,0 +1,32 @@
+# Copyright (c) 2026 Contributors to COVESA
+#
+# This program and the accompanying materials are made available under the
+# terms of the Mozilla Public License 2.0 which is available at
+# https://www.mozilla.org/en-US/MPL/2.0/
+#
+# SPDX-License-Identifier: MPL-2.0
+
+#
+# Static signals common to all trailer branches.
+#
+# These signals always exist, also when no trailer is coupled. They are NOT marked
+# "dynamic", so the broker never removes them. They are available to clients and to the
+# broker before the dynamic signals of the trailer branch are resolved, and
+# they carry the trigger signal and the input data of the branch actions.
+#
+
+IsConnected:
+  datatype: boolean
+  type: sensor
+  description: Indicates if a trailer is coupled at this position. True = Trailer coupled. False = No trailer coupled.
+  comment: Trigger signal of the events Connected and Disconnected of the trailer branch.
+           A change from false to true makes the broker resolve the dynamic signals of the branch.
+           A change from true to false makes the broker remove all dynamic signals of the branch.
+
+Id:
+  datatype: string
+  type: sensor
+  description: Unique identifier of the trailer coupled at this position, e.g. its VIN.
+  comment: Shall be set before or together with IsConnected changing to true.
+           Used by the action ResolveBranchByUri to build the URI of the trailer configuration.
+           The identifier says which trailer is coupled, the trailer position (Trailer1 to Trailer5) does not.

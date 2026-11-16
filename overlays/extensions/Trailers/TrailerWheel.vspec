@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 #
-# Definition of a single trailer wheel.
+# Dynamic signals of a single trailer wheel. All nodes are marked "dynamic: true".
 # Reduced compared to spec/Chassis/Wheel.vspec, as trailer wheels are not driven
 # and trailers typically use air brakes without brake fluid.
 #
@@ -15,37 +15,44 @@
 Speed:
   datatype: float
   type: sensor
+  dynamic: true
   unit: km/h
   description: Linear speed of the wheel.
 
 Tire:
   type: branch
+  dynamic: true
   description: Tire signals for the wheel.
 
 Tire.Pressure:
   datatype: uint16
   type: sensor
+  dynamic: true
   unit: kPa
   description: Tire pressure in kilo-Pascal.
 
 Tire.IsPressureLow:
   datatype: boolean
   type: sensor
+  dynamic: true
   description: Tire pressure status. True = Low tire pressure. False = Good tire pressure.
 
 Tire.AirTemperature:
   datatype: float
   type: sensor
+  dynamic: true
   unit: Celsius
   description: Air temperature inside the tire in Celsius.
 
 Brake:
   type: branch
+  dynamic: true
   description: Brake signals for the wheel.
 
 Brake.PadWear:
   datatype: uint8
   type: sensor
+  dynamic: true
   unit: percent
   max: 100
   description: Brake pad wear as percent. 0 = No wear. 100 = Worn.
@@ -53,4 +60,5 @@ Brake.PadWear:
 Brake.IsBrakesWorn:
   datatype: boolean
   type: sensor
+  dynamic: true
   description: Brake pad wear status. True = Worn. False = Not worn.

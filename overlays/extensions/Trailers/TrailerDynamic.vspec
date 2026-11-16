@@ -1,0 +1,154 @@
+# Copyright (c) 2026 Contributors to COVESA
+#
+# This program and the accompanying materials are made available under the
+# terms of the Mozilla Public License 2.0 which is available at
+# https://www.mozilla.org/en-US/MPL/2.0/
+#
+# SPDX-License-Identifier: MPL-2.0
+
+#
+# Dynamic signals of a single trailer.
+#
+# Every node in this file is marked "dynamic: true". The broker creates these nodes when the
+# trailer branch is resolved (action ResolveBranchByUri or ResolveBranchBySignalData) and removes
+# all of them when the trailer is decoupled (action RemoveDynamicSignals).
+# The definition given here is the upper bound. A resolved branch narrows it to the
+# trailer actually coupled, e.g. the number of axles and wheels, and provides values for the attributes.
+#
+# Within a dynamic branch, an "attribute" is constant for as long as the trailer stays coupled.
+# A "sensor" is provided at runtime by the trailer or the towing vehicle.
+#
+
+#
+# Identification
+#
+Identification:
+  type: branch
+  dynamic: true
+  description: Identification of the trailer coupled at this position.
+
+Identification.IdType:
+  datatype: string
+  type: attribute
+  dynamic: true
+  allowed: ['UNKNOWN', 'VIN', 'TELEMATICS_UNIT_ID', 'OEM_SPECIFIC']
+  default: 'UNKNOWN'
+  description: Type of identifier given in the static signal Id of the trailer branch.
+  comment: VIN = Vehicle Identification Number according to ISO 3779.
+           TELEMATICS_UNIT_ID = Identifier of the trailer telematics unit.
+           OEM_SPECIFIC = Other unique identifier defined by the trailer manufacturer.
+
+Identification.Manufacturer:
+  datatype: string
+  type: attribute
+  dynamic: true
+  description: Name of the trailer manufacturer.
+
+Identification.ConfigurationVersion:
+  datatype: string
+  type: attribute
+  dynamic: true
+  description: Version of the configuration the dynamic signals of this branch were resolved from.
+  comment: Allows a client to detect that a cached configuration is outdated.
+           Can for example be a version number or a content hash.
+
+#
+# General trailer properties
+#
+Type:
+  datatype: string
+  type: attribute
+  dynamic: true
+  allowed: ['UNKNOWN', 'SEMI_TRAILER', 'FULL_TRAILER', 'CENTER_AXLE_TRAILER', 'CONVERTER_DOLLY', 'CARAVAN', 'OTHER']
+  default: 'UNKNOWN'
+  description: Type of the trailer.
+
+Length:
+  datatype: uint16
+  type: attribute
+  dynamic: true
+  unit: mm
+  description: Overall length of the trailer, excluding the drawbar.
+
+Width:
+  datatype: uint16
+  type: attribute
+  dynamic: true
+  unit: mm
+  description: Overall width of the trailer.
+
+Height:
+  datatype: uint16
+  type: attribute
+  dynamic: true
+  unit: mm
+  description: Overall height of the trailer.
+
+GrossWeight:
+  datatype: uint32
+  type: attribute
+  dynamic: true
+  unit: kg
+  description: Maximum permitted weight of the trailer, including full load.
+
+AxleCount:
+  datatype: uint8
+  type: attribute
+  dynamic: true
+  min: 1
+  max: 15
+  description: Number of axles on the trailer.
+  comment: Equals the number of instances of the branch Axle in the resolved trailer branch.
+
+CurrentWeight:
+  datatype: uint32
+  type: sensor
+  dynamic: true
+  unit: kg
+  description: Current overall weight of the trailer, including load.
+
+#
+# Climate zones of the trailer
+#
+Climate:
+  type: branch
+  instances: Zone[1,2]
+  dynamic: true
+  description: Climate zone signals of the trailer, e.g. cargo compartments of a refrigerated trailer.
+
+Climate.TargetTemperature:
+  datatype: float
+  type: actuator
+  dynamic: true
+  unit: Celsius
+  description: Target temperature of the climate zone.
+
+#
+# Axles of the trailer
+#
+Axle:
+  type: branch
+  instances: Row[1,15]
+  dynamic: true
+  description: Axle signals of the trailer.
+  comment: Axles are counted from the front of the trailer.
+           The instance list defines the upper bound. The resolved trailer branch contains only the axles
+           the trailer actually has.
+
+#include TrailerAxle.vspec Axle
+
+#
+# Wheels on the axle
+#
+Axle.Wheel:
+  type: branch
+  instances: Position[1,15]
+  dynamic: true
+  description: Wheel signals of the trailer axle.
+  comment: Wheels are counted from left to right, as seen in the driving direction,
+           e.g. for an axle with twin tires Position1 = Left outer, Position2 = Left inner,
+           Position3 = Right inner, Position4 = Right outer.
+           The instance list defines the upper bound. The resolved trailer branch contains only the wheels
+           the axle actually has.
+
+#include TrailerWheel.vspec Axle.Wheel

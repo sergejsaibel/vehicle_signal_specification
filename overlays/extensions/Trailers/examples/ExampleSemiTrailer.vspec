@@ -11,29 +11,61 @@
 #   Vehicle.Trailers.ConfigurationUri = https://vss.tractor-oem.example/v1/trailer-configurations/{id}
 # The tractor OEM service maps the Id to the trailer OEM, which provides this document.
 #
-# The configuration is a VSS overlay ROOTED AT THE TRAILER INSTANCE.
+# The configuration is a VSS document ROOTED AT THE TRAILER BRANCH.
 # It contains no Vehicle.Trailers.TrailerN prefix, so the same document can be
-# bound to any trailer position. Binding is done by mounting it below the
-# instance where the trailer is coupled, e.g.
+# bound to any trailer position. Binding is done by mounting it at the
+# branch where the trailer is coupled, e.g.
 #   #include ExampleSemiTrailer.vspec Vehicle.Trailers.Trailer1
+# The same document content can be delivered in the signal Vss of Trailer2 (ResolveBranchBySignalData).
 #
 # The configuration:
-#   - narrows each dynamic branch (Axle, Axle.RowN.Wheel) to the instances that exist,
+#   - contains ALL signals of the gross list (../TrailerDynamic.vspec). The leaf signals of the axle and the wheel
+#     are taken from ../TrailerAxle.vspec and ../TrailerWheel.vspec, so they are the same as in the gross list,
+#   - limits the dynamic branches to the instances that exist: 3 axles (Row[1,3]) with 4 wheels each (Position[1,4]),
 #   - gives values to attributes by "default",
-#   - for enumerated attributes narrows "allowed" to the actual value.
+#   - for enumerated attributes narrows "allowed" to the actual value,
+#   - marks every node "dynamic: true", so that the broker can remove it again.
 #
-# Trailer: 3-axle semi-trailer, twin tires on all axles, first axle is a lift axle.
+# Trailer: 3-axle semi-trailer, twin tires on all axles, 2 climate zones.
 #
+
+#
+# Identification
+#
+Identification:
+  type: branch
+  dynamic: true
+  description: Identification of the trailer coupled at this position.
+
+Identification.IdType:
+  datatype: string
+  type: attribute
+  dynamic: true
+  allowed: ['VIN']
+  default: 'VIN'
+  description: Type of identifier given in the static signal Id of the trailer branch.
+
+Identification.Manufacturer:
+  datatype: string
+  type: attribute
+  dynamic: true
+  default: 'Example Trailer Works'
+  description: Name of the trailer manufacturer.
 
 Identification.ConfigurationVersion:
   datatype: string
   type: attribute
+  dynamic: true
   default: '2026-11-01'
-  description: Version of the trailer configuration resolved for this instance.
+  description: Version of the configuration the dynamic signals of this branch were resolved from.
 
+#
+# General trailer properties
+#
 Type:
   datatype: string
   type: attribute
+  dynamic: true
   allowed: ['SEMI_TRAILER']
   default: 'SEMI_TRAILER'
   description: Type of the trailer.
@@ -41,6 +73,7 @@ Type:
 Length:
   datatype: uint16
   type: attribute
+  dynamic: true
   unit: mm
   default: 13600
   description: Overall length of the trailer, excluding the drawbar.
@@ -48,6 +81,7 @@ Length:
 Width:
   datatype: uint16
   type: attribute
+  dynamic: true
   unit: mm
   default: 2550
   description: Overall width of the trailer.
@@ -55,6 +89,7 @@ Width:
 Height:
   datatype: uint16
   type: attribute
+  dynamic: true
   unit: mm
   default: 4000
   description: Overall height of the trailer.
@@ -62,6 +97,7 @@ Height:
 GrossWeight:
   datatype: uint32
   type: attribute
+  dynamic: true
   unit: kg
   default: 39000
   description: Maximum permitted weight of the trailer, including full load.
@@ -69,58 +105,51 @@ GrossWeight:
 AxleCount:
   datatype: uint8
   type: attribute
+  dynamic: true
   default: 3
   description: Number of axles on the trailer.
 
+CurrentWeight:
+  datatype: uint32
+  type: sensor
+  dynamic: true
+  unit: kg
+  description: Current overall weight of the trailer, including load.
+
+#
+# Climate zones of the trailer
+#
+Climate:
+  type: branch
+  instances: Zone[1,2]
+  dynamic: true
+  description: Climate zone signals of the trailer, e.g. cargo compartments of a refrigerated trailer.
+
+Climate.TargetTemperature:
+  datatype: float
+  type: actuator
+  dynamic: true
+  unit: Celsius
+  description: Target temperature of the climate zone.
+
+#
+# Axles of the trailer: 3 axles
+#
 Axle:
   type: branch
   instances: Row[1,3]
+  dynamic: true
   description: Axle signals of the trailer.
 
-#
-# Axle 1 - lift axle
-#
-Axle.Row1.WheelCount:
-  datatype: uint8
-  type: attribute
-  default: 4
-  description: Number of wheels on the axle.
+#include ../TrailerAxle.vspec Axle
 
-Axle.Row1.IsLiftAxle:
-  datatype: boolean
-  type: attribute
-  default: true
-  description: Indicates if the axle can be lifted. True = Lift axle. False = Fixed axle.
-
-Axle.Row1.Wheel:
+#
+# Wheels on each axle: 4 wheels
+#
+Axle.Wheel:
   type: branch
   instances: Position[1,4]
+  dynamic: true
   description: Wheel signals of the trailer axle.
 
-#
-# Axle 2
-#
-Axle.Row2.WheelCount:
-  datatype: uint8
-  type: attribute
-  default: 4
-  description: Number of wheels on the axle.
-
-Axle.Row2.Wheel:
-  type: branch
-  instances: Position[1,4]
-  description: Wheel signals of the trailer axle.
-
-#
-# Axle 3
-#
-Axle.Row3.WheelCount:
-  datatype: uint8
-  type: attribute
-  default: 4
-  description: Number of wheels on the axle.
-
-Axle.Row3.Wheel:
-  type: branch
-  instances: Position[1,4]
-  description: Wheel signals of the trailer axle.
+#include ../TrailerWheel.vspec Axle.Wheel

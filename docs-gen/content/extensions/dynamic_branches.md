@@ -7,6 +7,48 @@ weight: 8
 > It is implemented with the extended attributes `dynamic`, `events` and `actions` and demonstrated by the overlay
 > [overlays/extensions/Trailers.vspec](https://github.com/COVESA/vehicle_signal_specification/blob/master/overlays/extensions/Trailers.vspec).
 
+## Summary
+
+**What is proposed.** A *dynamic branch* is an ordinary VSS branch that carries its own description of how it comes
+and goes at runtime. The branch declares three things:
+
+1. **Events**: when something happens, for example `Connected` and `Disconnected`.
+2. **Triggers**: the signal change that fires an event, for example `IsConnected` changing from `false` to `true`
+   (`OnFalseToTrue`).
+3. **Actions**: what the broker does when the event fires, for example `ResolveBranchByUri`,
+   `ResolveBranchBySignalData` or `RemoveDynamicSignals`.
+
+Signals that always exist stay static. Signals that only exist while the branch is resolved are marked `dynamic: true`,
+so the broker knows exactly what to create and what to remove. The broker watches the triggers of all dynamic branches
+and performs the actions. Clients only see the result: dynamic signals appear and disappear in the tree.
+
+The use case is up to five trailers (`Vehicle.Trailers.Trailer1` to `Trailer5`) that are coupled and decoupled during
+operation, each with up to 15 axles and 15 wheels per axle. Four trailers are resolved from a URI, one from a signal
+that carries the branch definition.
+
+**Why encapsulate everything in the branch.**
+
+* **Self-describing.** Everything needed to understand the dynamic behavior is in one place: the static signals, the
+  dynamic signals, the triggers and the actions. A reader or a tool does not need to search for rules elsewhere.
+* **No special cases in the rest of the tree.** Other branches and the core VSS rules are unchanged. A branch that
+  declares no events and actions is a normal static branch, so existing specifications and tools stay valid.
+* **Reusable.** The same static and dynamic definition files are included in every trailer branch with `#include`.
+  The same pattern works for other parts that come and go, for example other attachable equipment.
+* **Small, safe contract for clients.** The static signals (`IsConnected`, `Id`) are always there and are the only
+  entry point. Dynamic signals exist only after the branch is resolved, and the `dynamic` marker lets the broker remove
+  them completely on disconnect.
+* **Broker-centered.** The logic lives in the broker, not in every client. The specification only has to describe
+  the behavior.
+
+**Well-proven concepts.** The proposal does not invent a new mechanism for dynamic behavior. It describes how to set it
+up with concepts that are well known from other domains: events, triggers and actions. Their meaning is the same as in
+rule engines, home automation and state machines, which makes them easy to understand, to implement and to test.
+
+**What is out of scope.** Creating the *tailored* content of a dynamic branch, that is, deciding which axles, wheels and
+signals a particular trailer has, is not solved here. This proposal only defines the gross list of all possible signals
+(`TrailerDynamic.vspec`) and how the broker gets and applies a configuration. How such tailored branches are produced
+belongs to the vehicle variant handling discussion, and should be solved there.
+
 ## Problem
 
 A VSS tree is static. All signals exist for the whole lifetime of the vehicle. Some parts of a vehicle combination change

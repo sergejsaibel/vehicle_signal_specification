@@ -37,8 +37,8 @@
 #   Trailer4  ResolveBranchByUri           Vehicle.Trailers.ConfigurationUri (+ Id)
 #   Trailer5  ResolveBranchByUri           Vehicle.Trailers.ConfigurationUri (+ Id)
 #
-# All trailer branches have the event Connected (resolve, trigger condition OnLowToHigh) and the event
-# Disconnected (action RemoveDynamicSignals, trigger condition OnHighToLow), both on the signal IsConnected
+# All trailer branches have the event Connected (resolve, trigger condition OnFalseToTrue) and the event
+# Disconnected (action RemoveDynamicSignals, trigger condition OnTrueToFalse), both on the signal IsConnected
 # of the branch.
 #
 # The dynamic signals (Trailers/TrailerDynamic.vspec, the gross list) are NOT included here, to keep the tree
@@ -100,12 +100,12 @@ Vehicle.Trailers.Trailer1:
     Connected:
       description: The trigger signal changed from false to true, i.e. a trailer was coupled.
       trigger:
-        OnLowToHigh: Vehicle.Trailers.Trailer1.IsConnected
+        OnFalseToTrue: Vehicle.Trailers.Trailer1.IsConnected
       actions: [ResolveBranchByUri]
     Disconnected:
       description: The trigger signal changed from true to false, i.e. the trailer was decoupled.
       trigger:
-        OnHighToLow: Vehicle.Trailers.Trailer1.IsConnected
+        OnTrueToFalse: Vehicle.Trailers.Trailer1.IsConnected
       actions: [RemoveDynamicSignals]
 
 #include Trailers/TrailerStatic.vspec Vehicle.Trailers.Trailer1
@@ -128,12 +128,12 @@ Vehicle.Trailers.Trailer2:
     Connected:
       description: The trigger signal changed from false to true, i.e. a trailer was coupled.
       trigger:
-        OnLowToHigh: Vehicle.Trailers.Trailer2.IsConnected
+        OnFalseToTrue: Vehicle.Trailers.Trailer2.IsConnected
       actions: [ResolveBranchBySignalData]
     Disconnected:
       description: The trigger signal changed from true to false, i.e. the trailer was decoupled.
       trigger:
-        OnHighToLow: Vehicle.Trailers.Trailer2.IsConnected
+        OnTrueToFalse: Vehicle.Trailers.Trailer2.IsConnected
       actions: [RemoveDynamicSignals]
 
 Vehicle.Trailers.Trailer2.Vss:
@@ -166,12 +166,12 @@ Vehicle.Trailers.Trailer3:
     Connected:
       description: The trigger signal changed from false to true, i.e. a trailer was coupled.
       trigger:
-        OnLowToHigh: Vehicle.Trailers.Trailer3.IsConnected
+        OnFalseToTrue: Vehicle.Trailers.Trailer3.IsConnected
       actions: [ResolveBranchByUri]
     Disconnected:
       description: The trigger signal changed from true to false, i.e. the trailer was decoupled.
       trigger:
-        OnHighToLow: Vehicle.Trailers.Trailer3.IsConnected
+        OnTrueToFalse: Vehicle.Trailers.Trailer3.IsConnected
       actions: [RemoveDynamicSignals]
 
 #include Trailers/TrailerStatic.vspec Vehicle.Trailers.Trailer3
@@ -194,12 +194,12 @@ Vehicle.Trailers.Trailer4:
     Connected:
       description: The trigger signal changed from false to true, i.e. a trailer was coupled.
       trigger:
-        OnLowToHigh: Vehicle.Trailers.Trailer4.IsConnected
+        OnFalseToTrue: Vehicle.Trailers.Trailer4.IsConnected
       actions: [ResolveBranchByUri]
     Disconnected:
       description: The trigger signal changed from true to false, i.e. the trailer was decoupled.
       trigger:
-        OnHighToLow: Vehicle.Trailers.Trailer4.IsConnected
+        OnTrueToFalse: Vehicle.Trailers.Trailer4.IsConnected
       actions: [RemoveDynamicSignals]
 
 #include Trailers/TrailerStatic.vspec Vehicle.Trailers.Trailer4
@@ -222,12 +222,12 @@ Vehicle.Trailers.Trailer5:
     Connected:
       description: The trigger signal changed from false to true, i.e. a trailer was coupled.
       trigger:
-        OnLowToHigh: Vehicle.Trailers.Trailer5.IsConnected
+        OnFalseToTrue: Vehicle.Trailers.Trailer5.IsConnected
       actions: [ResolveBranchByUri]
     Disconnected:
       description: The trigger signal changed from true to false, i.e. the trailer was decoupled.
       trigger:
-        OnHighToLow: Vehicle.Trailers.Trailer5.IsConnected
+        OnTrueToFalse: Vehicle.Trailers.Trailer5.IsConnected
       actions: [RemoveDynamicSignals]
 
 #include Trailers/TrailerStatic.vspec Vehicle.Trailers.Trailer5

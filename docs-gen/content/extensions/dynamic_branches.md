@@ -72,7 +72,7 @@ A mapping on a dynamic branch. The key is the event name, and each value defines
 | Key           | Required | Meaning |
 |---------------|----------|---------|
 | `description` | yes      | When the event fires. |
-| `trigger`     | yes      | Mapping with one entry. The key is the trigger condition (`OnLowToHigh` or `OnHighToLow`), the value is the full signal name of the trigger signal, see [Triggers](#triggers). |
+| `trigger`     | yes      | Mapping with one entry. The key is the trigger condition (`OnFalseToTrue` or `OnTrueToFalse`), the value is the full signal name of the trigger signal, see [Triggers](#triggers). |
 | `actions`     | yes      | List of action names declared on the same branch. The broker executes them in the listed order. |
 
 A branch can declare each event name only once.
@@ -91,8 +91,8 @@ In that case the broker handles it like a change from false to true.
 
 | Condition     | Fires when                                          |
 |---------------|-----------------------------------------------------|
-| `OnLowToHigh` | The trigger signal changes from `false` to `true`.  |
-| `OnHighToLow` | The trigger signal changes from `true` to `false`.  |
+| `OnFalseToTrue` | The trigger signal changes from `false` to `true`.  |
+| `OnTrueToFalse` | The trigger signal changes from `true` to `false`.  |
 
 If a trigger signal gets a value that equals the previous one, no event fires.
 If events of several branches fire together, the broker handles them independently, so one branch can not block another.
@@ -222,12 +222,12 @@ Vehicle.Trailers.Trailer1:
     Connected:
       description: The trigger signal changed from false to true, i.e. a trailer was coupled.
       trigger:
-        OnLowToHigh: Vehicle.Trailers.Trailer1.IsConnected
+        OnFalseToTrue: Vehicle.Trailers.Trailer1.IsConnected
       actions: [ResolveBranchByUri]
     Disconnected:
       description: The trigger signal changed from true to false, i.e. the trailer was decoupled.
       trigger:
-        OnHighToLow: Vehicle.Trailers.Trailer1.IsConnected
+        OnTrueToFalse: Vehicle.Trailers.Trailer1.IsConnected
       actions: [RemoveDynamicSignals]
 ```
 
@@ -249,11 +249,11 @@ Vehicle.Trailers.Trailer2:
   events:
     Connected:
       trigger:
-        OnLowToHigh: Vehicle.Trailers.Trailer2.IsConnected
+        OnFalseToTrue: Vehicle.Trailers.Trailer2.IsConnected
       actions: [ResolveBranchBySignalData]
     Disconnected:
       trigger:
-        OnHighToLow: Vehicle.Trailers.Trailer2.IsConnected
+        OnTrueToFalse: Vehicle.Trailers.Trailer2.IsConnected
       actions: [RemoveDynamicSignals]
 
 Vehicle.Trailers.Trailer2.Vss:

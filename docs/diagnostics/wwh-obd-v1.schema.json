@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:covesa:vss:diagnostics:wwh-obd:v1",
+  "title": "VSS TroubleCode Details - WWH-OBD / J1979-2 v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dtcFormat"],
+  "properties": {
+    "dtcFormat": {
+      "type": "string",
+      "enum": ["SAE-J2012", "SAE-J1939"]
+    },
+    "spn": { "type": "integer", "minimum": 0, "maximum": 524287 },
+    "fmi": { "type": "integer", "minimum": 0, "maximum": 31 },
+    "failureTypeByte": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "description": "Required-when-available for J2012 3-byte DTCs. Envelope Code stays base short form only."
+    },
+    "severity": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Required-when-available from 0x42. Absent for permanent 0x55.",
+      "properties": {
+        "checkImmediately": { "type": "boolean" },
+        "checkAtNextHalt": { "type": "boolean" },
+        "maintenanceOnly": { "type": "boolean" }
+      }
+    },
+    "class": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Required-when-available from 0x42 severity byte bits 0-4.",
+      "properties": {
+        "class0": { "type": "boolean" },
+        "class1": { "type": "boolean" },
+        "class2": { "type": "boolean" },
+        "class3": { "type": "boolean" },
+        "class4": { "type": "boolean" }
+      }
+    },
+    "warningIndicatorRequested": { "type": "boolean" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "dtcFormat": { "const": "SAE-J1939" } },
+        "required": ["dtcFormat"]
+      },
+      "then": { "required": ["spn", "fmi"] }
+    }
+  ]
+}

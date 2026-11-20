@@ -23,4 +23,5 @@ Diagnostics.DTCList:
 Diagnostics.ActiveTroubleCodes:
   datatype: VehicleDataTypes.TroubleCode[]
   type: sensor
-  description: Array of currently active trouble codes.
+  description: Array of currently active or confirmed trouble codes.
+              Do not include permanent DTCs. Pending should use a sibling signal when defined.

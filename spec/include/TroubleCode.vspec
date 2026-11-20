@@ -19,6 +19,8 @@ TroubleCode.ECU:
   datatype: string
   type: property
   description: Stable identifier of the reporting ECU or diagnostic source, unique within the vehicle.
+              When CodeSystem is SAE-J1939, use the decimal source address (e.g. "0").
+              When Details include sourceAddress, ECU MUST equal that value.
 
 TroubleCode.CodeSystem:
   datatype: string
@@ -33,7 +35,10 @@ TroubleCode.HasCode:
 TroubleCode.Code:
   datatype: string
   type: property
-  description: Source-provided trouble-code identifier; preserve it, or use an empty string when HasCode is false.
+  description: Source-provided trouble-code identifier; empty when HasCode is false.
+              SAE-J1939 - "<SPN>:<FMI>" decimal (e.g. "1569:31").
+              SAE-J2012 - base short form letter + 4 hex digits (e.g. "P2380").
+              Failure Type Byte MUST NOT be encoded in Code; use Details.failureTypeByte.
 
 TroubleCode.HasDetails:
   datatype: boolean
@@ -43,7 +48,24 @@ TroubleCode.HasDetails:
 TroubleCode.DetailsSchema:
   datatype: string
   type: property
-  description: Versioned URI identifying the Details schema, or an empty string when HasDetails is false.
+  description: Versioned URI identifying the Details schema, or empty when HasDetails is false.
+              Recognized COVESA URIs -
+                urn:covesa:vss:diagnostics:sae-j1939:v1
+                urn:covesa:vss:diagnostics:sae-j2012:v1
+                urn:covesa:vss:diagnostics:wwh-obd:v1
+              See docs/diagnostics/ for normative JSON Schemas.
+
+TroubleCode.HasDetailsSchemaDigest:
+  datatype: boolean
+  type: property
+  description: True when DetailsSchemaDigest is populated.
+
+TroubleCode.DetailsSchemaDigest:
+  datatype: string
+  type: property
+  description: Content digest of the Details schema document identified by DetailsSchema
+              (e.g. "sha256:<hex>"). Empty when HasDetailsSchemaDigest is false.
+              Enables local cache or catalog lookup without repeated network fetches.
 
 TroubleCode.Details:
   datatype: string
@@ -59,12 +81,13 @@ TroubleCode.Status:
   datatype: uint8
   type: property
   enum:
-    'UNKNOWN': 0  
+    'UNKNOWN': 0
     'ACTIVE': 1
     'PENDING': 2
     'INACTIVE': 3
   description: Normalized state ACTIVE, PENDING, INACTIVE, or UNKNOWN; empty when HasStatus is false.
               UNKNOWN means a status was supplied but could not be mapped.
+              Do not map permanent DTCs to INACTIVE; omit permanent from ActiveTroubleCodes.
 
 TroubleCode.HasOccurrenceCount:
   datatype: boolean

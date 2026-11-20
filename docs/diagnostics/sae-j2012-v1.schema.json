@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:covesa:vss:diagnostics:sae-j2012:v1",
+  "title": "VSS TroubleCode Details - SAE-J2012 classic v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "failureTypeByte": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "description": "Optional for classic 2-byte Mode 03/07/0A (usually absent)."
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:covesa:vss:diagnostics:sae-j1939:v1",
+  "title": "VSS TroubleCode Details - SAE-J1939 DM1 v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spn", "fmi", "sourceAddress", "lamps"],
+  "properties": {
+    "spn": { "type": "integer", "minimum": 0, "maximum": 524287 },
+    "fmi": { "type": "integer", "minimum": 0, "maximum": 31 },
+    "sourceAddress": { "type": "integer", "minimum": 0, "maximum": 255 },
+    "conversionMethod": { "type": "integer", "minimum": 0, "maximum": 1 },
+    "lamps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["malfunction", "redStop", "amberWarning", "protect"],
+      "description": "DM1 lamps are message-scoped; may be repeated on each DTC. 0=off, 1=on, 2=reserved, 3=unavailable. Not flashing.",
+      "properties": {
+        "malfunction": { "$ref": "#/$defs/j1939Lamp" },
+        "redStop": { "$ref": "#/$defs/j1939Lamp" },
+        "amberWarning": { "$ref": "#/$defs/j1939Lamp" },
+        "protect": { "$ref": "#/$defs/j1939Lamp" }
+      }
+    }
+  },
+  "$defs": {
+    "j1939Lamp": { "type": "integer", "enum": [0, 1, 2, 3] }
+  }
+}
